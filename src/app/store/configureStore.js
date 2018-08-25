@@ -16,7 +16,7 @@ export const configureStore = preloadedState => {
   //Enable Hot Module Replacement for Reducers
   if (process.env.NODE_ENV !== "production") {
     if (module.hot) {
-      module.hot.accept("../reducer/rootReducer", () => {
+      module.hot.accept("../reducers/rootReducer", () => {
         const newRootReducer = require("../reducers/rootReducer").default;
         store.replaceReducer(newRootReducer);
       });
