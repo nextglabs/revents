@@ -10,12 +10,10 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { configureStore } from "./app/store/configureStore";
 import ScrollToTop from "./app/common/util/ScrollToTop";
-import { loadEvents } from "./features/event/eventActions";
 
 const rootEl = document.getElementById("root");
 
 const store = configureStore();
-store.dispatch(loadEvents());
 
 let render = () => {
   ReactDOM.render(
@@ -40,6 +38,10 @@ if (module.hot) {
     setTimeout(render);
   });
 }
-render();
+
+store.firebaseAuthIsReady.then(()=> {
+  render();
+})
+
 
 registerServiceWorker();
