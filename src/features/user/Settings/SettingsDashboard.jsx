@@ -8,23 +8,35 @@ import AboutPage from "../Settings/AboutPage";
 import PhotosPage from "../Settings/PhotosPage";
 import AccountPage from "../Settings/AccountPage";
 import { updatePassword } from "../../auth/authActions";
-
+import { updateProfile } from "../userActions";
 const actions = {
-  updatePassword
+  updatePassword,
+  updateProfile
 };
 
 const mapState = state => ({
-  providerId: state.firebase.auth.providerData[0].providerId
+  providerId: state.firebase.auth.providerData[0].providerId,
+  user: state.firebase.profile
 });
 
-const SettingsDashboard = ({ updatePassword, providerId }) => {
+const SettingsDashboard = ({
+  updatePassword,
+  providerId,
+  user,
+  updateProfile
+}) => {
   return (
     <Grid>
       <Grid.Column width={12}>
         <Switch>
           <Redirect exact from="/settings" to="/settings/basic" />
-          <Route path="/settings/basic" component={BasicPage} />
-          <Route path="/settings/about" component={AboutPage} />
+          <Route
+            path="/settings/basic"
+            render={() => (
+              <BasicPage updateProfile={updateProfile} initialValues={user} />
+            )}
+          />
+          <Route path="/settings/about" render={() => <AboutPage updateProfile={updateProfile} initialValues={user} />} />
           <Route path="/settings/photos" component={PhotosPage} />
           <Route
             path="/settings/account"
