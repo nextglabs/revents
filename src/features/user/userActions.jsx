@@ -41,7 +41,7 @@ export const uploadProfileImage = (file, fileName) => async (
     name: imageName
   };
   try {
-    dispatch(asyncActionStart())
+    dispatch(asyncActionStart());
     // upload file to firebase storage
     let uploadedFile = await firebase.uploadFile(path, file, null, options);
     // get url of image
@@ -71,10 +71,10 @@ export const uploadProfileImage = (file, fileName) => async (
         url: downloadURL
       }
     );
-    dispatch(asyncActionFinish())
+    dispatch(asyncActionFinish());
   } catch (error) {
     console.log(error);
-    dispatch(asyncActionError())
+    dispatch(asyncActionError());
     throw new Error("Problem uploading photo");
   }
 };
@@ -113,5 +113,58 @@ export const setMainPhoto = photo => async (
   } catch (error) {
     console.log(error);
     throw new Error("Problem setting main photo");
+  }
+};
+
+export const goingToEvent = event => async (
+  dispatch,
+  getState,
+  { getFirestore }
+) => {
+  const firestore = getFirestore();
+  const user = firestore.auth().currentUser;
+  const photoURL = getState().firebase.profile.photoURL;
+  const attendee = {
+    going: true,
+    joinDate: Date.now(),
+    photoURL: photoURL || '/assets/user.png',
+    displayName: user.displayName,
+    host: false
+  };
+  try {
+    await firestore.update(`events/${event.id}`, {
+      [`attendees.${user.uid}`]: attendee
+    });
+    await firestore.set(`event_attendee/${event.id}_${user.uid}`, {
+      eventId: event.id,
+      userUid: user.uid,
+      eventDate: event.date,
+      host: false
+    });
+    toastr.success("Success", "You have signed up to the event");
+  } catch (error) {
+    console.log(error);
+    toastr.error("Oops", "Problem signing up to event");
+  }
+};
+
+export const cancelGoingToEvent = event => async (
+  dispatch,
+  getState,
+  { getFirestore }
+) => {
+  const firestore = getFirestore();
+  const user = firestore.auth().currentUser;
+  try {
+    //remove attendee object from object map inside event
+    await firestore.update(`events/${event.id}`, {
+      //FieldValue.delete(), deletes individual field rather than the whole document
+      [`attendees.${user.uid}`]: firestore.FieldValue.delete()
+    });
+    await firestore.delete(`event_attendee/${event.id}_${user.uid}`);
+    toastr.success("Success", "You have removed yourself from the event");
+  } catch (error) {
+    console.log(error);
+    toastr.error("Oops", "Something went wront");
   }
 };

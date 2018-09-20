@@ -6,8 +6,7 @@ import {
   incrementAsync,
   decrementAsync
 } from "./testActions";
-import { Button, Icon } from "semantic-ui-react";
-import Script from "react-load-script";
+import { Button } from "semantic-ui-react";
 import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng
